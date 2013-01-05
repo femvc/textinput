@@ -433,11 +433,13 @@ bui.Control.prototype = {
     appendTo : function(wrap) {
         var uiObj = this,
             elem = wrap,
-            control;
+            control,
+            container = document.body;
         if (wrap && wrap.appendChild && wrap.childNodes) {
             while(elem && elem.tagName && elem.tagName.toLowerCase()!='body'){
                 if (elem && elem.getAttribute && elem.control) {
                     control = bui.Control.get(elem.control, opt_action);
+                    //将控件从临时容器移动到指定控件下
                     bui.Control.prototype.appendControl.call(control, uiObj);
                     break;
                 }
@@ -452,8 +454,16 @@ bui.Control.prototype = {
         }
         else if (wrap && wrap.controlMap) {
             bui.Control.prototype.appendControl.call(wrap, uiObj);
-            if (wrap.main && uiObj.main) {
-                wrap.main.appendChild(uiObj.main);
+            if (uiObj.main) {
+                control = wrap;
+                while (control) {
+                    if (control.main) {
+                        container = control.main;
+                        break;
+                    }
+                    control = control.parentControl;
+                }
+                container.appendChild(uiObj.main);
             }
         }
     },
